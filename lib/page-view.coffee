@@ -14,8 +14,7 @@ class PageView extends View
     @localPage = page
     url = page.url
 
-    browser     = page.getBrowser()
-    omniboxView = browser.getOmniboxView()
+    @browser     = page.getBrowser()
     @page = page
 
     @webview = atom.webRenderFrames.createFrame @
@@ -32,15 +31,22 @@ class PageView extends View
       @localPage.locationChanged url
       @localPage.setTitle title
 
+      if @browser.omnibox
+        @browser.omnibox.setUrl url
+
   getTitle: ->
     if not @webview or not @webview[0]
       return ''
     webview = @webview[0]
-    if webview.getTitle()
+    if webview.getTitle
       return webview.getTitle()
 
   getUrl: ->
-    return @webview[0].src || @webview.attr 'src' || 'about:blank'
+    if not @webview or not @webview[0]
+      return ''
+    webview = @webview[0]
+    if webview.getUrl
+      return @getWebview().getUrl()
 
   setLocation: (url) ->
     if @webview
@@ -51,11 +57,11 @@ class PageView extends View
 
   goBack: ->
     if @webview
-      @webview.goBack()
+      @webview[0].goBack()
 
   goForward: ->
     if @webview
-      @webview.goForward()
+      @webview[0].goForward()
 
   goVisible: ->
     @css('visibility', 'visible')
